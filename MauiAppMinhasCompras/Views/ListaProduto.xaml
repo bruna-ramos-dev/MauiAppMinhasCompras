@@ -5,74 +5,40 @@
              Title="Minhas Compras">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Somar"
-                     Clicked="ToolbarItem_Clicked_1" />
-
-        <ToolbarItem Text="Adicionar"
-                     Clicked="ToolbarItem_Clicked" />
+        <ToolbarItem Text="Somar" Clicked="ToolbarItem_Clicked_1" />
+        <ToolbarItem Text="Adicionar" Clicked="ToolbarItem_Clicked" />
     </ContentPage.ToolbarItems>
 
-    <VerticalStackLayout Padding="10">
-
-        <!-- Barra de busca -->
-        <SearchBar x:Name="txt_search"
-                   Placeholder="Buscar produto..."
-                   TextChanged="Txt_search_TextChanged"/>
-
-        <!-- Lista de produtos -->
-        <ListView x:Name="lst_produtos"
-                  SeparatorVisibility="Default">
-
-            <!-- Cabeçalho -->
+    <VerticalStackLayout>
+        <SearchBar x:Name="txt_search" 
+                   Placeholder="Busca de Produtos"
+                   TextChanged="txt_search_TextChanged"/>
+        <ListView x:Name="lst_produtos" ItemSelected="lst_produtos_ItemSelected">
             <ListView.Header>
-                <Grid ColumnDefinitions="*,3*,*,*,*">
-                    <Label Grid.Column="0" Text="ID" FontAttributes="Bold"/>
-                    <Label Grid.Column="1" Text="Descrição" FontAttributes="Bold"/>
-                    <Label Grid.Column="2" Text="Preço" FontAttributes="Bold"/>
-                    <Label Grid.Column="3" Text="Qtd" FontAttributes="Bold"/>
-                    <Label Grid.Column="4" Text="Total" FontAttributes="Bold"/>
+                <Grid ColumnDefinitions="*, *, *, *, *">
+                    <Label Grid.Column="0" Text="ID" />
+                    <Label Grid.Column="1" Text="Descrição" />
+                    <Label Grid.Column="2" Text="Preço" />
+                    <Label Grid.Column="3" Text="Qnt" />
+                    <Label Grid.Column="4" Text="Total" />
                 </Grid>
             </ListView.Header>
-
-            <!-- Template da linha -->
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-
-                        <!-- Menu de ação -->
                         <ViewCell.ContextActions>
-                            <MenuItem Text="Remover"
-                                      Clicked="MenuItem_Clicked"
-                                      IsDestructive="True"/>
+                            <MenuItem Text="Remover" Clicked="MenuItem_Clicked" />
                         </ViewCell.ContextActions>
-
-                        <!-- Conteúdo da linha -->
-                        <Grid ColumnDefinitions="*,3*,*,*,*"
-                              Padding="5">
-
-                            <Label Grid.Column="0"
-                                   Text="{Binding Id}" />
-
-                            <Label Grid.Column="1"
-                                   Text="{Binding Descricao}" />
-
-                            <Label Grid.Column="2"
-                                   Text="{Binding Preco}" />
-
-                            <Label Grid.Column="3"
-                                   Text="{Binding Quantidade}" />
-
-                            <Label Grid.Column="4"
-                                   Text="{Binding Total}" />
-
+                        <Grid ColumnDefinitions="*, *, *, *, *">
+                            <Label Grid.Column="0" Text="{Binding Id}" />
+                            <Label Grid.Column="1" Text="{Binding Descricao}" />
+                            <Label Grid.Column="2" Text="{Binding Preco}" />
+                            <Label Grid.Column="3" Text="{Binding Quantidade}" />
+                            <Label Grid.Column="4" Text="{Binding Total}" />
                         </Grid>
-
                     </ViewCell>
                 </DataTemplate>
             </ListView.ItemTemplate>
-
         </ListView>
-
     </VerticalStackLayout>
-
 </ContentPage>
