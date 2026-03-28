@@ -1,4 +1,4 @@
-using MauiAppMinhasCompras.Models;
+ï»¿using MauiAppMinhasCompras.Models;
 using System.Collections.ObjectModel;
 
 namespace MauiAppMinhasCompras.Views;
@@ -7,12 +7,12 @@ public partial class ListaProduto : ContentPage
 {
     // ObservableCollection usada para atualizar a interface automaticamente
     ObservableCollection<Produto> lista = new ObservableCollection<Produto>();
-
+    List<Produto> listaCompleta = new List<Produto>();
     public ListaProduto()
     {
         InitializeComponent();
 
-        // Liga a lista à interface
+        // Liga a lista Ã  interface
         lst_produtos.ItemsSource = lista;
     }
 
@@ -23,9 +23,18 @@ public partial class ListaProduto : ContentPage
         {
             lista.Clear();
 
-            List<Produto> tmp = await App.Db.GetAll();
+            listaCompleta = await App.Db.GetAll();
 
-            tmp.ForEach(i => lista.Add(i));
+            listaCompleta.ForEach(i => lista.Add(i));
+
+            // ðŸ”½ CARREGAR CATEGORIAS NO PICKER
+            var categorias = listaCompleta
+                .Select(p => p.Categoria)
+                .Where(c => !string.IsNullOrEmpty(c))
+                .Distinct()
+                .ToList();
+
+            picker_categoria.ItemsSource = categorias;
         }
         catch (Exception ex)
         {
@@ -33,35 +42,48 @@ public partial class ListaProduto : ContentPage
         }
     }
 
-    // Botão para abrir tela de cadastro de produto
-    private void ToolbarItem_Clicked(object sender, EventArgs e)
+    private void OnCategoriaSelecionada(object sender, EventArgs e)
     {
         try
         {
-            Navigation.PushAsync(new Views.NovoProduto());
+            if (picker_categoria.SelectedIndex == -1)
+                return;
+
+            string categoria = picker_categoria.SelectedItem.ToString();
+
+            var filtrados = listaCompleta
+                .Where(p => p.Categoria == categoria)
+                .ToList();
+
+            lista.Clear();
+            filtrados.ForEach(i => lista.Add(i));
         }
         catch (Exception ex)
         {
             DisplayAlert("Ops", ex.Message, "OK");
         }
     }
-
-    // Busca dinâmica com SearchBar
-    private async void txt_search_TextChanged(object sender, TextChangedEventArgs e)
+    // Busca dinÃ¢mica com SearchBar
+    private void txt_search_TextChanged(object sender, TextChangedEventArgs e)
     {
         try
         {
-            string q = e.NewTextValue;
+            string q = e.NewTextValue?.ToLower() ?? "";
+
+            var filtrados = listaCompleta
+                .Where(p => p.Descricao.ToLower().Contains(q))
+                .ToList();
 
             lista.Clear();
-
-            List<Produto> tmp = await App.Db.Search(q);
-
-            tmp.ForEach(i => lista.Add(i));
+            filtrados.ForEach(i => lista.Add(i));
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ops", ex.Message, "OK");
+            DisplayAlert("Ops", ex.Message, "OK");
+        }
+        finally
+        {
+            lst_produtos.IsRefreshing = false;
         }
     }
 
@@ -71,7 +93,7 @@ public partial class ListaProduto : ContentPage
     {
         double soma = lista.Sum(i => i.Total);
 
-        string msg = $"O total é {soma:C}";
+        string msg = $"O total Ã© {soma:C}";
 
         DisplayAlert("Total dos Produtos", msg, "OK");
     }
@@ -86,7 +108,7 @@ public partial class ListaProduto : ContentPage
             Produto p = selecinado.BindingContext as Produto;
 
             bool confirm = await DisplayAlert(
-                "Tem Certeza?", $"Remover {p.Descricao}?", "Sim", "Não");
+                "Tem Certeza?", $"Remover {p.Descricao}?", "Sim", "NÃ£o");
 
             if (confirm)
             {
@@ -113,6 +135,58 @@ public partial class ListaProduto : ContentPage
         catch (Exception ex)
         {
             DisplayAlert("Ops", ex.Message, "OK");
+        }
+    }
+
+    private async void lst_produtos_Refreshing(object sender, EventArgs e)
+    {
+        try
+        {
+            lista.Clear();
+
+            listaCompleta = await App.Db.GetAll();
+
+            listaCompleta.ForEach(i => lista.Add(i));
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Ops", ex.Message, "OK");
+        }
+        finally
+        {
+            lst_produtos.IsRefreshing = false;
+        }
+    }
+
+    private async void ToolbarItem_Relatorio(object sender, EventArgs e)
+    {
+        var relatorio = listaCompleta
+            .GroupBy(p => p.Categoria)
+            .Select(g => new
+            {
+                Categoria = g.Key,
+                Total = g.Sum(p => p.Total)
+            })
+            .ToList();
+
+        string msg = "";
+
+        foreach (var item in relatorio)
+        {
+            msg += $"{item.Categoria}: {item.Total:C}\n";
+        }
+
+        await DisplayAlert("Gastos por Categoria", msg, "OK");
+    }
+    private void ToolbarItem_Clicked(object sender, EventArgs e)
+    {
+        try
+        {
+            Navigation.PushAsync(new Views.NovoProduto());
+        }
+        catch (Exception ex)
+        {
+            DisplayAlert("Erro", ex.Message, "OK");
         }
     }
 }

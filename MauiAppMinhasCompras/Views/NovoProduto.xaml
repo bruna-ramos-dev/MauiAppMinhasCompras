@@ -4,18 +4,25 @@
              x:Class="MauiAppMinhasCompras.Views.NovoProduto"
              Title="Novo Produto">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Salvar" Clicked="ToolbarItem_Clicked" />
-    </ContentPage.ToolbarItems>
+    <StackLayout Padding="10" Spacing="10">
 
-    <VerticalStackLayout Spacing="10" Padding="10">
-        <Label Text="Descrição do Produto:" />
-        <Entry x:Name="txt_descricao" />
+        <Entry x:Name="txt_descricao"
+               Placeholder="Descrição" />
 
-        <Label Text="Quantidade:" />
-        <Entry x:Name="txt_quantidade" Keyboard="Numeric" />
+        <Entry x:Name="txt_quantidade"
+               Placeholder="Quantidade"
+               Keyboard="Numeric" />
 
-        <Label Text="Preço Unitário:" />
-        <Entry x:Name="txt_preco" Keyboard="Numeric" />
-    </VerticalStackLayout>
+        <Entry x:Name="txt_preco"
+               Placeholder="Preço"
+               Keyboard="Numeric" />
+
+        <Entry x:Name="txt_categoria"
+               Placeholder="Categoria (Ex: Alimentos, Limpeza)" />
+
+        <Button Text="Salvar"
+                Clicked="ToolbarItem_Clicked"/>
+
+    </StackLayout>
+
 </ContentPage>
